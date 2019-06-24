@@ -42,13 +42,36 @@ void simpleHighway(pcl::visualization::PCLVisualizer::Ptr& viewer)
     // ----------------------------------------------------
     
     // RENDER OPTIONS
-    bool renderScene = true;
+    bool renderScene = false;
     std::vector<Car> cars = initHighway(renderScene, viewer);
     
     // TODO:: Create lidar sensor 
+    Lidar* lidar = new Lidar(cars,0);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr inputcloud = lidar->scan();
+    //renderPointCloud(viewer,inputcloud,"pointoflidar");
 
     // TODO:: Create point processor
-  
+    ProcessPointClouds<pcl::PointXYZ> pointprocessor;
+    std::pair< pcl::PointCloud<pcl::PointXYZ>::Ptr, pcl::PointCloud<pcl::PointXYZ>::Ptr> segment = pointprocessor.SegmentPlane(inputcloud, 100, 0.2);
+    renderPointCloud(viewer, segment.first, "plancloud", Color(1,0,0));       //输出点云分割地面的结果
+    renderPointCloud(viewer, segment.second, "obstcloud", Color(0,1,0));      //输出点云分割障碍物的结果
+
+    //61-73是障碍物点云聚类，然后给予bouning box的结果。
+    /* 
+    std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> cloudcluster = pointprocessor.Clustering(segment.second, 1.0, 3, 30);
+    std::cout<<"num of cluster："<<cloudcluster.size()<<endl;
+    std::vector<Color> colors = {Color(1,0,0),Color(0,1,0),Color(0,0,1)};
+    int clusterid = 0;
+    for(pcl::PointCloud<pcl::PointXYZ>::Ptr cluster: cloudcluster){
+        std::cout<<"size of cluster"+std::to_string(clusterid)<<":";
+        pointprocessor.numPoints(cluster);
+        renderPointCloud(viewer, cluster, "obcluster"+std::to_string(clusterid), colors[clusterid % colors.size()]);
+        
+        Box box = pointprocessor.BoundingBox(cluster);
+        renderBox(viewer,box,clusterid);
+        clusterid++;
+    }
+    */
 }
 
 
