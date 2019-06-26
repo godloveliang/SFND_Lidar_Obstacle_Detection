@@ -45,6 +45,8 @@
         "tuple": "cpp",
         "typeindex": "cpp",
         "typeinfo": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "core": "cpp",
+        "numericaldiff": "cpp"
     }
 }
